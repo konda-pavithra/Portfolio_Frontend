@@ -453,6 +453,68 @@ body {
   margin-top: 22px;
 }
 
+/* ── upload preview modal ── */
+.modal--wide {
+  width: min(760px, 92vw);
+}
+
+.upload-user-msg {
+  font-size: 0.88rem;
+  color: #1976d2;
+  background: #e8f0fe;
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 18px;
+  line-height: 1.5;
+}
+
+.upload-section {
+  margin-bottom: 18px;
+}
+
+.upload-section h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.upload-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+}
+
+.upload-table th {
+  background: #f4f6fb;
+  color: #555;
+  font-weight: 600;
+  padding: 7px 10px;
+  text-align: left;
+  border-bottom: 1px solid #e0e4ef;
+}
+
+.upload-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid #f0f2f8;
+  color: #222;
+}
+
+.upload-table tr:last-child td {
+  border-bottom: none;
+}
+
+.upload-warn {
+  font-size: 0.82rem;
+  color: #c0392b;
+  background: #fdf0ef;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
 /* ── bottom ticker bar ── */
 .ticker-bar {
   position: fixed;

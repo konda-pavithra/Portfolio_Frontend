@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { register } from '../api/auth';
+import { useGoogleLogin } from '@react-oauth/google';
+import { register, googleAuth } from '../api/auth';
 import '../styles/auth.css';
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -48,7 +49,33 @@ export default function Register() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleGoogleSuccess = async (accessToken: string) => {
+    setGoogleLoading(true);
+    setServerError('');
+    try {
+      const res = await googleAuth(accessToken);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('username', res.data.username);
+      navigate('/portfolio');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Google sign-up failed.';
+      setServerError(typeof msg === 'string' ? msg : 'Google sign-up failed.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const registerWithGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => handleGoogleSuccess(tokenResponse.access_token),
+    onError: () => {
+      setGoogleLoading(false);
+      setServerError('Google sign-in was cancelled or failed.');
+    },
+    flow: 'implicit',
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -130,9 +157,14 @@ export default function Register() {
 
         <div className="auth-right-wrap">
           <div className="auth-card">
-            <button className="google-btn" type="button">
+            <button
+              className="google-btn"
+              type="button"
+              onClick={() => registerWithGoogle()}
+              disabled={googleLoading}
+            >
               <GoogleIcon />
-              REGISTER USING GOOGLE
+              {googleLoading ? 'SIGNING IN...' : 'REGISTER USING GOOGLE'}
             </button>
 
             <div className="divider">or using email</div>

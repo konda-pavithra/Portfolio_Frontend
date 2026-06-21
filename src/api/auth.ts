@@ -24,3 +24,6 @@ export const register = (data: RegisterPayload) =>
 
 export const login = (data: LoginPayload) =>
   api.post<LoginResponse>('/api/users/login', data);
+
+export const googleAuth = (accessToken: string) =>
+  api.post<LoginResponse>('/api/users/google', { accessToken });

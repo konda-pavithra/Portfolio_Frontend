@@ -67,3 +67,54 @@ export interface PortfolioValuation {
 
 export const getValuation = () =>
   api.get<PortfolioValuation>('/api/portfolio/valuation');
+
+export interface PortfolioEntry {
+  symbol: string;
+  displaySymbol: string;
+  companyName: string;
+  quantity: number;
+  buyingPrice: number;
+}
+
+export interface PortfolioUpdateItem {
+  symbol: string;
+  displaySymbol: string;
+  companyName: string;
+  currentQuantity: number;
+  currentBuyingPrice: number;
+  newQuantity: number;
+  newBuyingPrice: number;
+  changeDescription: string;
+}
+
+export interface PortfolioUploadPreview {
+  newStocks: PortfolioEntry[];
+  stocksToUpdate: PortfolioUpdateItem[];
+  invalidSymbols: string[];
+  parseErrors: string[];
+  userMessage: string;
+  requiresConfirmation: boolean;
+}
+
+export interface PortfolioConfirmRequest {
+  toAdd: PortfolioEntry[];
+  toUpdate: PortfolioEntry[];
+}
+
+export interface PortfolioConfirmResponse {
+  addedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  message: string;
+}
+
+export const uploadPortfolio = (file: File) => {
+  const form = new FormData();
+  form.append('file', file);
+  return api.post<PortfolioUploadPreview>('/api/portfolio/upload', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};
+
+export const confirmUpload = (data: PortfolioConfirmRequest) =>
+  api.post<PortfolioConfirmResponse>('/api/portfolio/confirm', data);

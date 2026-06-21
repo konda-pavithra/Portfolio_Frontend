@@ -1,6 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { login } from '../api/auth';
+import { useGoogleLogin } from '@react-oauth/google';
+import { login, googleAuth } from '../api/auth';
 import '../styles/auth.css';
 
 function EyeIcon({ open }: { open: boolean }) {
@@ -39,7 +40,33 @@ export default function Login() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleGoogleSuccess = async (idToken: string) => {
+    setGoogleLoading(true);
+    setError('');
+    try {
+      const res = await googleAuth(idToken);
+      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('username', res.data.username);
+      navigate('/portfolio');
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Google login failed.';
+      setError(typeof msg === 'string' ? msg : 'Google login failed.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: (tokenResponse) => handleGoogleSuccess(tokenResponse.access_token),
+    onError: () => {
+      setGoogleLoading(false);
+      setError('Google sign-in was cancelled or failed.');
+    },
+    flow: 'implicit',
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -88,9 +115,14 @@ export default function Login() {
 
         <div className="auth-right-wrap">
           <div className="auth-card">
-            <button className="google-btn" type="button">
+            <button
+              className="google-btn"
+              type="button"
+              onClick={() => loginWithGoogle()}
+              disabled={googleLoading}
+            >
               <GoogleIcon />
-              LOGIN USING GOOGLE
+              {googleLoading ? 'SIGNING IN...' : 'LOGIN USING GOOGLE'}
             </button>
 
             <div className="divider">or using email</div>
