@@ -75,6 +75,7 @@ export default function Register() {
       setServerError('Google sign-in was cancelled or failed.');
     },
     flow: 'implicit',
+    ux_mode: 'popup',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

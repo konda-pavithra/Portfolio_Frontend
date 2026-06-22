@@ -14,11 +14,16 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// if backend returns 401 kick the user out
+// if backend returns 401 kick the user out — but not on auth endpoints themselves
+// (a failed Google/password login should show an error message, not redirect)
+const AUTH_ENDPOINTS = ['/api/users/login', '/api/users/register', '/api/users/google'];
+
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) {
+    const url = err.config?.url || '';
+    const isAuthEndpoint = AUTH_ENDPOINTS.some((p) => url.includes(p));
+    if (err.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem('token');
       localStorage.removeItem('username');
       window.location.href = '/login';
